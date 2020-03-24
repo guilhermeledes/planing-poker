@@ -1,0 +1,49 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Primeiro jogo multiplayer</title>
+
+        <style>
+            #poker-table {
+                width: 80%;
+                border: 3px solid #ccc;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="poker-table"></div>
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="module">
+            import createGame from './game.js'
+            import renderScreen from './renderScreen.js'
+
+            const game = createGame();
+            const socket = io();
+
+            socket.on('connect', () => {
+                const playerId = socket.id;
+                console.log(`Player connected on Client with id: ${playerId}`);
+
+                const screen = document.getElementById('poker-table');
+                renderScreen(screen, game, requestAnimationFrame, playerId);
+            });
+
+            socket.on('setup', (state) => {
+                const playerId = socket.id;
+                game.setState(state);
+            });
+
+            socket.on('add-player', (command) => {
+                console.log(`Receiving ${command.type} -> ${command.playerId}`);
+                game.addPlayer(command);
+            });
+
+            socket.on('remove-player', (command) => {
+                console.log(`Receiving ${command.type} -> ${command.playerId}`);
+                game.removePlayer(command);
+            });
+
+        </script>
+    </body>
+</html>
