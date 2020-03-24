@@ -4,7 +4,20 @@ export default function createGame() {
         round: {}
     }
 
-    const cards = [0, .5, 1 , 2 , 3 , 5 , 8 , 13 , 20 , 40 , 90 , 100]
+    const cards = {
+        0: {},
+        .5: {},
+        1: {},
+        2: {},
+        3: {},
+        5: {},
+        8: {},
+        13: {},
+        20: {},
+        40: {},
+        90: {},
+        100: {},
+    }
 
     function setState(newState) {
         Object.assign(state, newState);
