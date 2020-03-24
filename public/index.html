@@ -6,12 +6,69 @@
         <style>
             #poker-table {
                 width: 80%;
+                height: 80%;
+                border-radius: 30px;
                 border: 3px solid #ccc;
+                padding: 15px;
+                margin: 0 auto;
+            }
+
+            .card {
+                background-color: transparent;
+                width: 115px;
+                height: 130px;
+                perspective: 1000px;
+            }
+
+            .card-inner {
+                position: relative;
+                text-align: center;
+                transition: transform 0.6s;
+                transform-style: preserve-3d;
+            }
+
+            .card:hover .card-inner {
+                transform: rotateY(180deg);
+            }
+
+            .card-front, .card-back {
+                border: solid 3px #26653f;
+                border-radius: 12px;
+                position: absolute;
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+            }
+
+            .card-back {
+                transform: rotateY(180deg);
+            }
+
+            .card .card-label {
+                margin: 3px;
+                padding: 5px 25px;
+                border-radius: 8px;
+                background: #26653f;
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 95px;
+                text-align: center;
+                color: #fff;
             }
         </style>
     </head>
     <body>
-        <div id="poker-table"></div>
+        <div id="poker-table">
+
+            <div class="card">
+                <div class="card-inner">
+                    <div class="card-front">
+                        <div class="card-label">?</div>
+                    </div>
+                    <div class="card-back">
+                        <div class="card-label">3</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <script src="/socket.io/socket.io.js"></script>
         <script type="module">
