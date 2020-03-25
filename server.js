@@ -8,6 +8,7 @@ const server = http.createServer(app);
 const sockets = socketio(server);
 
 app.use(express.static('public'));
+app.use(express.static('node_modules/font-awesome'));
 
 const game = createGame();
 

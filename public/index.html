@@ -3,6 +3,7 @@
         <meta charset="utf-8">
         <title>Primeiro jogo multiplayer</title>
 
+        <link rel="stylesheet" href="css/font-awesome.min.css">
         <style>
             #poker-table {
                 width: 80%;
@@ -13,11 +14,24 @@
                 margin: 0 auto;
             }
 
+            .player-place {
+                float: left;
+            }
+
+            .player-place .player-name {
+                display: block;
+                font-family: Arial, Helvetica, sans-serif;
+                text-align: center;
+                font-weight: bold;
+                color: #26653f;
+            }
+
             .card {
                 background-color: transparent;
                 width: 115px;
                 height: 130px;
                 perspective: 1000px;
+                padding: 20px;
             }
 
             .card-inner {
@@ -28,6 +42,7 @@
             }
 
             .card:hover .card-inner {
+                -ms-transform: rotateY(180deg);
                 transform: rotateY(180deg);
             }
 
@@ -37,37 +52,97 @@
                 position: absolute;
                 -webkit-backface-visibility: hidden;
                 backface-visibility: hidden;
+                width: 100%;
+                height: 125px;
             }
 
             .card-back {
+                -ms-transform: rotateY(180deg);
                 transform: rotateY(180deg);
             }
 
-            .card .card-label {
+            .card .card-fill {
+                height: 119px;
                 margin: 3px;
-                padding: 5px 25px;
                 border-radius: 8px;
                 background: #26653f;
+                display: flex;
+                align-items: center;
+            }
+
+            .card .card-fill > .card-label {
                 font-family: Arial, Helvetica, sans-serif;
                 font-size: 95px;
                 text-align: center;
                 color: #fff;
+                display: block;
+                width: 100%;
+            }
+
+            .card .card-fill > .card-label > .fa {
+                font-size: 70px;
             }
         </style>
     </head>
     <body>
         <div id="poker-table">
 
-            <div class="card">
-                <div class="card-inner">
-                    <div class="card-front">
-                        <div class="card-label">?</div>
-                    </div>
-                    <div class="card-back">
-                        <div class="card-label">3</div>
+            <div class="player-place">
+                <div class="card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-fill">
+                                <span class="card-label">?</span>
+                            </div>
+                        </div>
+                        <div class="card-back">
+                            <div class="card-fill">
+                                <span class="card-label">3</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <span class="player-name">Ledes</span>
             </div>
+
+            <div class="player-place">
+                <div class="card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-fill">
+                                <span class="card-label">
+                                    <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-back">
+                            <div class="card-fill">
+                                <span class="card-label">5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <span class="player-name">Ledes</span>
+            </div>
+
+            <div class="player-place">
+                <div class="card">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-fill">
+                                <span class="card-label">?</span>
+                            </div>
+                        </div>
+                        <div class="card-back">
+                            <div class="card-fill">
+                                <span class="card-label">8</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <span class="player-name">Ledes</span>
+            </div>
+
         </div>
 
         <script src="/socket.io/socket.io.js"></script>
