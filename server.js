@@ -19,9 +19,6 @@ game.subscribe((command) => {
 
 sockets.on('connection', (socket) => {
     const playerId = socket.id;
-    console.log(`> Player connected on Server with id: ${playerId}`);
-
-    game.addPlayer({playerId});
 
     socket.emit('setup', game.state);
 
@@ -30,11 +27,13 @@ sockets.on('connection', (socket) => {
         console.log(`Player disconnected ${playerId}`);
     });
 
-    socket.on('move-player', (command) => {
-        command.type = 'move-player';
-        command.playerId = playerId;
+    socket.on('add-player', (command) => {
+        console.log(`> Player connected on Server with id: ${playerId}`);
 
-        game.movePlayer(command);
+        game.addPlayer({
+            playerId,
+            playerName: command.playerName
+        });
     });
 
 });

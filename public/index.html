@@ -6,65 +6,74 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
         <style>
-            #poker-table {
-                width: 80%;
-                height: 80%;
+            #poker-table, #player-hand {
+                width: 90%;
                 border-radius: 30px;
                 border: 3px solid #ccc;
                 padding: 15px;
-                margin: 0 auto;
+                margin: 25px auto;
+                display: flow-root;
             }
 
-            .player-place {
+            #player-hand {
+                width: fit-content;
+            }
+
+            #poker-table {
+                min-height: 190px;
+            }
+
+            .player, .hand {
                 float: left;
+                padding-right: 15px;
+                width: 130px;
             }
 
-            .player-place .player-name {
+            .player .player-name {
                 display: block;
                 font-family: Arial, Helvetica, sans-serif;
                 text-align: center;
                 font-weight: bold;
                 color: #26653f;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
-            .card {
+            .card-game {
                 background-color: transparent;
                 width: 115px;
                 height: 130px;
                 perspective: 1000px;
-                padding: 20px;
             }
 
-            .card-inner {
+            .card-game-inner {
                 position: relative;
                 text-align: center;
                 transition: transform 0.6s;
                 transform-style: preserve-3d;
             }
 
-            .card:hover .card-inner {
-                -ms-transform: rotateY(180deg);
-                transform: rotateY(180deg);
-            }
-
-            .card-front, .card-back {
+            .card-game-front, .card-game-back {
                 border: solid 3px #26653f;
                 border-radius: 12px;
                 position: absolute;
                 -webkit-backface-visibility: hidden;
                 backface-visibility: hidden;
                 width: 100%;
-                height: 125px;
+                height: 130px;
             }
 
-            .card-back {
+            .card-game-back {
                 -ms-transform: rotateY(180deg);
                 transform: rotateY(180deg);
             }
 
-            .card .card-fill {
-                height: 119px;
+            .card-game .card-game-fill {
+                height: 118px;
                 margin: 3px;
                 border-radius: 8px;
                 background: #26653f;
@@ -72,7 +81,7 @@
                 align-items: center;
             }
 
-            .card .card-fill > .card-label {
+            .card-game .card-game-fill > .card-game-label {
                 font-family: Arial, Helvetica, sans-serif;
                 font-size: 95px;
                 text-align: center;
@@ -81,95 +90,77 @@
                 width: 100%;
             }
 
-            .card .card-fill > .card-label > .fa {
+            .hand .card-game .card-game-fill > .card-game-label {
+                font-size: 55px;
+            }
+
+            .card-game .card-game-fill > .card-game-label > .fa {
                 font-size: 70px;
             }
+
+            .player.confirmed .card-game-fill > .card-game-label.waiting {
+                display: none;
+            }
+
+            .player .card-game-fill > .card-game-label.confirmed {
+                display: none;
+            }
+
+            .player.confirmed .card-game-fill > .card-game-label.confirmed {
+                display: block;
+            }
+
+            #poker-table.show-all .card-game .card-game-inner {
+                -ms-transform: rotateY(180deg);
+                transform: rotateY(180deg);
+            }
+
         </style>
     </head>
     <body>
-        <div id="poker-table">
+        <div id="poker-table"></div>
 
-            <div class="player-place">
-                <div class="card">
-                    <div class="card-inner">
-                        <div class="card-front">
-                            <div class="card-fill">
-                                <span class="card-label">?</span>
-                            </div>
-                        </div>
-                        <div class="card-back">
-                            <div class="card-fill">
-                                <span class="card-label">3</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <span class="player-name">Ledes</span>
+        <div id="player-identification" class="container">
+            <div class="form-group">
+                <label for="name">Nome:</label>
+                <input type="text" class="form-control" id="name">
             </div>
 
-            <div class="player-place">
-                <div class="card">
-                    <div class="card-inner">
-                        <div class="card-front">
-                            <div class="card-fill">
-                                <span class="card-label">
-                                    <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
-                                </span>
-                            </div>
-                        </div>
-                        <div class="card-back">
-                            <div class="card-fill">
-                                <span class="card-label">5</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <span class="player-name">Ledes</span>
-            </div>
-
-            <div class="player-place">
-                <div class="card">
-                    <div class="card-inner">
-                        <div class="card-front">
-                            <div class="card-fill">
-                                <span class="card-label">?</span>
-                            </div>
-                        </div>
-                        <div class="card-back">
-                            <div class="card-fill">
-                                <span class="card-label">8</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <span class="player-name">Ledes</span>
-            </div>
-
+            <button>Entrar no Jogo</button>
         </div>
 
         <script src="/socket.io/socket.io.js"></script>
         <script type="module">
+            const $ = document.querySelector.bind(document);
             import createGame from './game.js'
             import renderScreen from './renderScreen.js'
 
             const game = createGame();
             const socket = io();
 
+            $('button').addEventListener('click', () => {
+                const playerId = socket.id;
+                const player = {
+                    playerId,
+                    playerName: $('#name').value
+                };
+                socket.emit('add-player', player);
+            });
+
             socket.on('connect', () => {
                 const playerId = socket.id;
-                console.log(`Player connected on Client with id: ${playerId}`);
+                console.log(`Player id: ${playerId}`);
 
-                const screen = document.getElementById('poker-table');
-                renderScreen(screen, game, requestAnimationFrame, playerId);
+                renderScreen(document, game, requestAnimationFrame, playerId);
             });
 
             socket.on('setup', (state) => {
-                const playerId = socket.id;
                 game.setState(state);
             });
 
             socket.on('add-player', (command) => {
-                console.log(`Receiving ${command.type} -> ${command.playerId}`);
+                console.log(`Receiving ${command.type} -> ${command.playerId} = ${command.playerName}`);
+                const playerId = socket.id;
                 game.addPlayer(command);
             });
 
