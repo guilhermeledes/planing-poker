@@ -26,6 +26,7 @@ export default function renderScreen(screen, game, requestAnimationFrame, curren
     function addPlayer(player) {
         let playerHtml = document.createElement('div');
         playerHtml.classList.add('player')
+        playerHtml.title = player.playerName;
         playerHtml.innerHTML = `
             <div class="card-game">
                 <div class="card-game-inner">
