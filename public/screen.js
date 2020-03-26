@@ -3,7 +3,7 @@ export default function createScreen(document, game, currentPlayerId) {
     const pokerTable = $('#poker-table', document)[0];
     const state = {
         pokerTable,
-        playerHand: {},
+        playerCards: {},
         players: {}
     }
 
@@ -54,7 +54,7 @@ export default function createScreen(document, game, currentPlayerId) {
     game.subscribe((command) => {
         const renderFuncion = renderingCommands[command.type];
         if (renderFuncion) {
-            console.log(`Rendering ${command.type} -> ${command.playerId}`);
+            console.log(`Rendering ${command.type}`);
             renderFuncion(command);
         }
     });
@@ -66,6 +66,14 @@ export default function createScreen(document, game, currentPlayerId) {
     function showGameResult(command) {
         setPlayedCardsValue(command.players);
         showHands();
+
+        let gameResultCard = document.createElement('div');
+        gameResultCard.id = 'game-result';
+        gameResultCard.innerHTML = `
+            <span class="result">Resultado</span>
+            ${getSimpleCardHtml(command.result)}`;
+
+        state.pokerTable.append(gameResultCard);
     }
 
     function setPlayedCardsValue(players) {
@@ -76,8 +84,15 @@ export default function createScreen(document, game, currentPlayerId) {
         }
     }
 
-    function showHands() {
+    async function showHands() {
         state.pokerTable.classList.add('show-all');
+        for (const playerId in state.players) {
+            await sleep(100);
+            if (state.players.hasOwnProperty(playerId)) {
+                const player = state.players[playerId];
+                player.html.classList.add('show');
+            }
+        }
     }
 
     function addPlayer(player) {
@@ -108,29 +123,21 @@ export default function createScreen(document, game, currentPlayerId) {
         if (player.ready) playerReady(playerId)
     }
 
-    function addPlayerHand() {
+    async function addPlayerHand() {
         let playerHand = document.createElement('div');
         playerHand.id = 'player-hand';
-        $('body', document)[0].append(playerHand);
+        $('body')[0].append(playerHand);
 
         for (const cardId in game.cards) {
+            await sleep(100);
             let card = game.cards[cardId];
             let cardHtml = document.createElement('div');
-            cardHtml.classList.add('hand')
-            cardHtml.innerHTML = `
-                <div class="card-game">
-                    <div class="card-game-inner">
-                        <div class="card-game-front">
-                            <div class="card-game-fill">
-                                <span class="card-game-label waiting">${card.display}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            cardHtml.classList.add('hand');
+            cardHtml.innerHTML = getSimpleCardHtml(card.display);
 
             playerHand.append(cardHtml);
-            state.playerHand[cardId] = Object.assign({ html:cardHtml }, card);
+            state.playerCards[cardId] = Object.assign({ html:cardHtml }, card);
+            state.playerHand = playerHand;
 
             cardHtml.addEventListener('click', () => {
                 notifyAll({
@@ -140,6 +147,26 @@ export default function createScreen(document, game, currentPlayerId) {
                 });
             });
         }
+    }
+
+    function sleep(ms) {
+        return new Promise(resolve => {
+            setTimeout(function(){resolve(() => {});},ms);
+        });
+    }
+
+    function getSimpleCardHtml(cardLabel) {
+        return `
+            <div class="card-game">
+                <div class="card-game-inner">
+                    <div class="card-game-front">
+                        <div class="card-game-fill">
+                            <span class="card-game-label waiting">${cardLabel}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     return {

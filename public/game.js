@@ -99,7 +99,7 @@ export default function createGame() {
         }
         const playerQuantity = Object.keys(state.players).length;
 
-        state.result = totalEstimate / playerQuantity
+        state.result = Math.ceil(totalEstimate / playerQuantity);
 
         showGameResult({ state });
     }

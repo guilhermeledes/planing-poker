@@ -22,6 +22,14 @@
                 display: flow-root;
             }
 
+            #game-result {
+                clear: both;
+                padding: 5px;
+                width: max-content;
+                min-width: 107px;
+                margin: 0 auto;
+            }
+
             #player-hand {
                 width: fit-content;
                 max-width: 90%;
@@ -37,7 +45,7 @@
                 width: 107px;
             }
 
-            .player .player-name {
+            .player .player-name, #poker-table .result {
                 display: block;
                 font-family: Arial, Helvetica, sans-serif;
                 text-align: center;
@@ -111,13 +119,31 @@
                 display: block;
             }
 
-            #poker-table.show-all .card-game .card-game-inner {
+            #poker-table.show-all .player.show .card-game .card-game-inner {
                 -ms-transform: rotateY(180deg);
                 transform: rotateY(180deg);
             }
 
+            #poker-table #game-result .result {
+                color: #1e77d0;
+            }
+
+            #poker-table #game-result .card-game .card-game-fill > .card-game-label {
+                color: #FFF;
+            }
+
+            #poker-table #game-result .card-game .card-game-fill {
+                background: #1e77d0;
+            }
+
+            #poker-table #game-result .card-game-front,
+            #poker-table #game-result .card-game-back {
+                border-color: #1e77d0;
+            }
+
         </style>
     </head>
+
     <body>
         <div id="poker-table"></div>
 
@@ -132,67 +158,67 @@
                 <button type="submit" class="btn btn-primary">Entrar no Jogo</button>
             </form>
         </div>
-
-        <script src="/socket.io/socket.io.js"></script>
-        <script type="module">
-            const $ = document.querySelector.bind(document);
-            import createGame from './game.js'
-            import createScreen from './screen.js'
-
-            const game = createGame();
-            let screen;
-            const socket = io();
-
-            $('button').addEventListener('click', (event) => {
-                if ($('form').checkValidity() === false) $('form').classList.add('was-validated');
-            });
-
-            $('form').addEventListener('submit', (event) => {
-                event.preventDefault();
-                const playerId = socket.id;
-                const player = {
-                    playerId,
-                    playerName: $('#name').value
-                };
-                socket.emit('add-player', player);
-            });
-
-            socket.on('connect', () => {
-                const playerId = socket.id;
-                console.log(`Player id: ${playerId}`);
-            });
-
-            socket.on('setup', (state) => {
-                const playerId = socket.id;
-                game.setState(state);
-                screen = createScreen(document, game, playerId);
-                screen.subscribe( (command) => {
-                    console.log(`> Emmiting ${command.type}`), command;
-                    socket.emit(command.type, command);
-                });
-            });
-
-            socket.on('add-player', (command) => {
-                console.log(`Receiving ${command.type} -> ${command.playerId} = ${command.playerName}`);
-                const playerId = socket.id;
-                game.addPlayer(command);
-            });
-
-            socket.on('remove-player', (command) => {
-                console.log(`Receiving ${command.type} -> ${command.playerId}`);
-                game.removePlayer(command);
-            });
-
-            socket.on('player-ready', (command) => {
-                console.log(`Receiving ${command.type} -> ${command.playerId}`);
-                game.playerReady(command.playerId);
-            });
-
-            socket.on('show-game-result', (command) => {
-                console.log(`Receiving ${command.type}`);
-                game.showGameResult(command);
-            });
-
-        </script>
     </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module">
+        const $ = document.querySelector.bind(document);
+        import createGame from './game.js'
+        import createScreen from './screen.js'
+
+        const game = createGame();
+        let screen;
+        const socket = io();
+
+        $('button').addEventListener('click', (event) => {
+            if ($('form').checkValidity() === false) $('form').classList.add('was-validated');
+        });
+
+        $('form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const playerId = socket.id;
+            const player = {
+                playerId,
+                playerName: $('#name').value
+            };
+            socket.emit('add-player', player);
+        });
+
+        socket.on('connect', () => {
+            const playerId = socket.id;
+            console.log(`Player id: ${playerId}`);
+        });
+
+        socket.on('setup', (state) => {
+            const playerId = socket.id;
+            game.setState(state);
+            screen = createScreen(document, game, playerId);
+            screen.subscribe( (command) => {
+                console.log(`> Emmiting ${command.type}`), command;
+                socket.emit(command.type, command);
+            });
+        });
+
+        socket.on('add-player', (command) => {
+            console.log(`Receiving ${command.type} -> ${command.playerId} = ${command.playerName}`);
+            const playerId = socket.id;
+            game.addPlayer(command);
+        });
+
+        socket.on('remove-player', (command) => {
+            console.log(`Receiving ${command.type} -> ${command.playerId}`);
+            game.removePlayer(command);
+        });
+
+        socket.on('player-ready', (command) => {
+            console.log(`Receiving ${command.type} -> ${command.playerId}`);
+            game.playerReady(command.playerId);
+        });
+
+        socket.on('show-game-result', (command) => {
+            console.log(`Receiving ${command.type}`);
+            game.showGameResult(command);
+        });
+
+    </script>
 </html>
