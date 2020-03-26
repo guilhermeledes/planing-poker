@@ -47,8 +47,7 @@ export default function createScreen(document, game, currentPlayerId) {
             playerReady(playerId);
         },
         'show-game-result': (command) => {
-            const players = command.players;
-            showGameResult(players);
+            showGameResult(command.state);
         }
     }
 
@@ -64,12 +63,20 @@ export default function createScreen(document, game, currentPlayerId) {
         state.players[playerId].html.classList.add('ready');
     }
 
-    function showGameResult(players) {
+    function showGameResult(command) {
+        setPlayedCardsValue(command.players);
+        showHands();
+    }
+
+    function setPlayedCardsValue(players) {
         for (const playerId in players) {
             const player = Object.assign(state.players[playerId], players[playerId]);
             let card = game.cards[player.estimateCard];
             player.html.querySelector('.card-game-back .card-game-label').innerHTML = card.display;
         }
+    }
+
+    function showHands() {
         state.pokerTable.classList.add('show-all');
     }
 

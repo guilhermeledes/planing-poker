@@ -1,22 +1,19 @@
 export default function createGame() {
     const state = {
         players: {},
-        round: {}
+        result: undefined
     }
 
     const cards = {
-        1: {display: '0', value: 0},
-        2: {display: '½', value: .5},
-        3: {display: '1', value: 1},
-        4: {display: '2', value: 2},
-        5: {display: '3', value: 3},
-        6: {display: '5', value: 5},
-        7: {display: '8', value: 8},
-        8: {display: '13', value: 13},
-        9: {display: '20', value: 20},
-        10: {display: '40', value: 40},
-        11: {display: '90', value: 90},
-        12: {display: '100', value: 100},
+        1: {display: '1', value: 1},
+        2: {display: '2', value: 2},
+        3: {display: '3', value: 3},
+        4: {display: '5', value: 5},
+        5: {display: '8', value: 8},
+        6: {display: '13', value: 13},
+        7: {display: '20', value: 20},
+        8: {display: '40', value: 40},
+        9: {display: '80', value: 80},
     }
 
     function setState(newState) {
@@ -92,15 +89,25 @@ export default function createGame() {
     }
 
     function calculateGameResult() {
-        //to-do
-        //calcular resultado do jogo
-        showGameResult(state.players);
+        let totalEstimate = 0;
+        for (const playerId in state.players) {
+            if (state.players.hasOwnProperty(playerId)) {
+                const player = state.players[playerId];
+                const card = cards[player.estimateCard];
+                totalEstimate += card.value;
+            }
+        }
+        const playerQuantity = Object.keys(state.players).length;
+
+        state.result = totalEstimate / playerQuantity
+
+        showGameResult({ state });
     }
 
-    function showGameResult(players) {
+    function showGameResult(command) {
         notifyAll({
             type: 'show-game-result',
-            players
+            state: command.state
         });
     }
 

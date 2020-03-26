@@ -190,7 +190,7 @@
 
             socket.on('show-game-result', (command) => {
                 console.log(`Receiving ${command.type}`);
-                game.showGameResult(command.players);
+                game.showGameResult(command);
             });
 
         </script>
