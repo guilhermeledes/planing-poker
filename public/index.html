@@ -92,19 +92,11 @@
 
             .card-game .card-game-fill > .card-game-label {
                 font-family: Arial, Helvetica, sans-serif;
-                font-size: 95px;
+                font-size: 50px;
                 text-align: center;
                 color: #fff;
                 display: block;
                 width: 100%;
-            }
-
-            .hand .card-game .card-game-fill > .card-game-label {
-                font-size: 50px;
-            }
-
-            .card-game .card-game-fill > .card-game-label > .fa {
-                font-size: 70px;
             }
 
             .player.ready .card-game-fill > .card-game-label.waiting {
@@ -194,6 +186,11 @@
             socket.on('player-ready', (command) => {
                 console.log(`Receiving ${command.type} -> ${command.playerId}`);
                 game.playerReady(command.playerId);
+            });
+
+            socket.on('show-game-result', (command) => {
+                console.log(`Receiving ${command.type}`);
+                game.showGameResult(command.players);
             });
 
         </script>

@@ -62,11 +62,12 @@ export default function createGame() {
 
     function estimate(command) {
         const playerId = command.playerId;
-        const card = cards[command.cardId];
+        const cardId = command.cardId;
 
-        console.log(command);
+        state.players[playerId].estimateCard = cardId;
 
         playerReady(playerId);
+        if (isGameFinished()) calculateGameResult();
     }
 
     function playerReady(playerId) {
@@ -78,11 +79,37 @@ export default function createGame() {
         });
     }
 
+    function isGameFinished() {
+        let gameFinished = true;
+        for (const playerId in state.players) {
+            const player = state.players[playerId];
+            if (!player.estimateCard) {
+                gameFinished = false;
+                break;
+            }
+        }
+        return gameFinished;
+    }
+
+    function calculateGameResult() {
+        //to-do
+        //calcular resultado do jogo
+        showGameResult(state.players);
+    }
+
+    function showGameResult(players) {
+        notifyAll({
+            type: 'show-game-result',
+            players
+        });
+    }
+
     return {
         addPlayer,
         removePlayer,
         estimate,
         playerReady,
+        showGameResult,
         state,
         subscribe,
         setState,
