@@ -61,10 +61,11 @@ export default function createGame() {
         const playerId = command.playerId;
         const cardId = command.cardId;
 
-        state.players[playerId].estimateCard = cardId;
-
-        playerReady(playerId);
-        if (isGameFinished()) calculateGameResult();
+        if (state.players[playerId]) {
+            state.players[playerId].estimateCard = cardId;
+            playerReady(playerId);
+            if (isGameFinished()) calculateGameResult();
+        }
     }
 
     function playerReady(playerId) {
