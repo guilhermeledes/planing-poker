@@ -111,10 +111,30 @@ export default function createGame() {
         });
     }
 
+    function restart() {
+        state.result = undefined;
+        for (const playerId in state.players) {
+            if (state.players.hasOwnProperty(playerId)) {
+                resetPlayer(playerId);
+            }
+        }
+        notifyAll({
+            type: 'restart-game',
+            state
+        });
+    }
+
+    function resetPlayer(playerId) {
+        const player = state.players[playerId];
+        player.ready = false;
+        delete player.estimateCard;
+    }
+
     return {
         addPlayer,
         removePlayer,
         estimate,
+        restart,
         playerReady,
         showGameResult,
         state,

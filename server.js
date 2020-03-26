@@ -45,6 +45,12 @@ sockets.on('connection', (socket) => {
         });
     });
 
+    socket.on('restart-game', (command) => {
+        console.log(`> restart-game`);
+
+        game.restart();
+    });
+
 });
 
 server.listen(3000, () => {

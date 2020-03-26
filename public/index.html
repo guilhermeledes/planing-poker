@@ -141,6 +141,13 @@
                 border-color: #1e77d0;
             }
 
+            .hand.selected .card-game-front, .hand.selected .card-game-back {
+                box-shadow: 0 0 10px 8px rgba(255, 169, 46, 0.65);
+            }
+
+            #poker-table #game-result button {
+                margin: 10px 0;
+            }
         </style>
     </head>
 
@@ -155,7 +162,7 @@
                     <div class="invalid-feedback">Campo obrigatório.</div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Entrar no Jogo</button>
+                <button type="submit" class="btn btn-sm btn-outline-primary btn-block">Entrar no Jogo</button>
             </form>
         </div>
     </body>
@@ -218,6 +225,11 @@
         socket.on('show-game-result', (command) => {
             console.log(`Receiving ${command.type}`);
             game.showGameResult(command);
+        });
+
+        socket.on('restart-game', (command) => {
+            console.log(`Receiving ${command.type}`);
+            game.restart();
         });
 
     </script>

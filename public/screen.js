@@ -20,9 +20,17 @@ export default function createScreen(document, game, currentPlayerId) {
         }
     }
 
-    for (const playerId in game.state.players) {
-        const player = game.state.players[playerId];
-        addPlayer(player);
+    function startGame() {
+        for (const playerId in game.state.players) {
+            const player = game.state.players[playerId];
+            addPlayer(player);
+        }
+    }
+
+    function restartGame() {
+        clearTable();
+        clearSelectedCard();
+        startGame();
     }
 
     const renderingCommands = {
@@ -48,6 +56,9 @@ export default function createScreen(document, game, currentPlayerId) {
         },
         'show-game-result': (command) => {
             showGameResult(command.state);
+        },
+        'restart-game': (command) => {
+            restartGame();
         }
     }
 
@@ -67,11 +78,25 @@ export default function createScreen(document, game, currentPlayerId) {
         setPlayedCardsValue(command.players);
         showHands();
 
+        if (!$('#game-result')[0]) createGameResultCard();
+        $('#game-result')[0].querySelector('.card-game-label').innerHTML = command.result;
+
+    }
+
+    function createGameResultCard() {
         let gameResultCard = document.createElement('div');
         gameResultCard.id = 'game-result';
         gameResultCard.innerHTML = `
             <span class="result">Resultado</span>
-            ${getSimpleCardHtml(command.result)}`;
+            ${getSimpleCardHtml('')}
+            <button class="btn btn-sm btn-outline-primary btn-block">Reiniciar</button>
+            `;
+
+        gameResultCard.querySelector('button').addEventListener('click', () => {
+            notifyAll({
+                type: 'restart-game'
+            });
+        });
 
         state.pokerTable.append(gameResultCard);
     }
@@ -140,6 +165,8 @@ export default function createScreen(document, game, currentPlayerId) {
             state.playerHand = playerHand;
 
             cardHtml.addEventListener('click', () => {
+                clearSelectedCard();
+                cardHtml.classList.add('selected');
                 notifyAll({
                     type: 'card-click',
                     playerId: currentPlayerId,
@@ -168,6 +195,19 @@ export default function createScreen(document, game, currentPlayerId) {
             </div>
         `;
     }
+
+    function clearSelectedCard() {
+        $('.selected').forEach(card => {
+            card.classList.remove('selected');
+        });
+    }
+
+    function clearTable() {
+        state.pokerTable.innerHTML = '';
+        state.pokerTable.classList.remove('show-all');
+    }
+
+    startGame();
 
     return {
         subscribe
