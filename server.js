@@ -27,6 +27,15 @@ sockets.on('connection', (socket) => {
         console.log(`Player disconnected ${playerId}`);
     });
 
+    socket.on('card-click', (command) => {
+        console.log(`> Player estimate ${playerId}`);
+
+        game.estimate({
+            playerId,
+            cardId: command.cardId
+        });
+    });
+
     socket.on('add-player', (command) => {
         console.log(`> Player connected on Server with id: ${playerId}`);
 

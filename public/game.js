@@ -40,7 +40,7 @@ export default function createGame() {
         const playerId = command.playerId;
         const playerName = command.playerName;
 
-        state.players[playerId] = { playerId, playerName };
+        state.players[playerId] = { playerId, playerName, ready: false };
 
         notifyAll({
             type: 'add-player',
@@ -60,9 +60,29 @@ export default function createGame() {
         });
     }
 
+    function estimate(command) {
+        const playerId = command.playerId;
+        const card = cards[command.cardId];
+
+        console.log(command);
+
+        playerReady(playerId);
+    }
+
+    function playerReady(playerId) {
+        state.players[playerId].ready = true;
+
+        notifyAll({
+            type: 'player-ready',
+            playerId
+        });
+    }
+
     return {
         addPlayer,
         removePlayer,
+        estimate,
+        playerReady,
         state,
         subscribe,
         setState,

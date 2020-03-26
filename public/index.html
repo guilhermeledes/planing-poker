@@ -55,6 +55,10 @@
                 perspective: 1000px;
             }
 
+            .hand .card-game {
+                cursor: pointer;
+            }
+
             .card-game-inner {
                 position: relative;
                 text-align: center;
@@ -103,15 +107,15 @@
                 font-size: 70px;
             }
 
-            .player.confirmed .card-game-fill > .card-game-label.waiting {
+            .player.ready .card-game-fill > .card-game-label.waiting {
                 display: none;
             }
 
-            .player .card-game-fill > .card-game-label.confirmed {
+            .player .card-game-fill > .card-game-label.ready {
                 display: none;
             }
 
-            .player.confirmed .card-game-fill > .card-game-label.confirmed {
+            .player.ready .card-game-fill > .card-game-label.ready {
                 display: block;
             }
 
@@ -141,9 +145,10 @@
         <script type="module">
             const $ = document.querySelector.bind(document);
             import createGame from './game.js'
-            import renderScreen from './renderScreen.js'
+            import createScreen from './screen.js'
 
             const game = createGame();
+            let screen;
             const socket = io();
 
             $('button').addEventListener('click', (event) => {
@@ -168,7 +173,11 @@
             socket.on('setup', (state) => {
                 const playerId = socket.id;
                 game.setState(state);
-                renderScreen(document, game, playerId);
+                screen = createScreen(document, game, playerId);
+                screen.subscribe( (command) => {
+                    console.log(`> Emmiting ${command.type}`), command;
+                    socket.emit(command.type, command);
+                });
             });
 
             socket.on('add-player', (command) => {
@@ -180,6 +189,11 @@
             socket.on('remove-player', (command) => {
                 console.log(`Receiving ${command.type} -> ${command.playerId}`);
                 game.removePlayer(command);
+            });
+
+            socket.on('player-ready', (command) => {
+                console.log(`Receiving ${command.type} -> ${command.playerId}`);
+                game.playerReady(command.playerId);
             });
 
         </script>

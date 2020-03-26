@@ -1,9 +1,23 @@
-export default function renderScreen(document, game, currentPlayerId) {
+export default function createScreen(document, game, currentPlayerId) {
     const $ = document.querySelectorAll.bind(document);
     const pokerTable = $('#poker-table', document)[0];
     const state = {
         pokerTable,
+        playerHand: {},
         players: {}
+    }
+
+    const observers= [];
+
+    function subscribe(observerFunction) {
+        observers.push(observerFunction);
+    }
+
+    function notifyAll(command) {
+
+        for (const observerFunction of observers) {
+            observerFunction(command);
+        }
     }
 
     for (const playerId in game.state.players) {
@@ -25,8 +39,12 @@ export default function renderScreen(document, game, currentPlayerId) {
         },
         'remove-player': (command) => {
             const playerId = command.playerId;
-            const player = state.players[playerId]
+            const player = state.players[playerId];
             if (player) player.html.remove();
+        },
+        'player-ready': (command) => {
+            const playerId = command.playerId;
+            playerReady(playerId);
         }
     }
 
@@ -38,7 +56,12 @@ export default function renderScreen(document, game, currentPlayerId) {
         }
     });
 
+    function playerReady(playerId) {
+        state.players[playerId].html.classList.add('ready');
+    }
+
     function addPlayer(player) {
+        const playerId = player.playerId;
         let playerHtml = document.createElement('div');
         playerHtml.classList.add('player')
         playerHtml.title = player.playerName;
@@ -48,7 +71,7 @@ export default function renderScreen(document, game, currentPlayerId) {
                     <div class="card-game-front">
                         <div class="card-game-fill">
                             <span class="card-game-label waiting">?</span>
-                            <span class="card-game-label confirmed"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i></span>
+                            <span class="card-game-label ready"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i></span>
                         </div>
                     </div>
                     <div class="card-game-back">
@@ -61,7 +84,8 @@ export default function renderScreen(document, game, currentPlayerId) {
             <span class="player-name">${player.playerName}</span>
         `;
         state.pokerTable.append(playerHtml);
-        state.players[player.playerId] = { html: playerHtml};
+        state.players[playerId] = Object.assign({ html: playerHtml }, player);
+        if (player.ready) playerReady(playerId)
     }
 
     function addPlayerHand() {
@@ -70,7 +94,7 @@ export default function renderScreen(document, game, currentPlayerId) {
         $('body', document)[0].append(playerHand);
 
         for (const cardId in game.cards) {
-            const card = game.cards[cardId];
+            let card = game.cards[cardId];
             let cardHtml = document.createElement('div');
             cardHtml.classList.add('hand')
             cardHtml.innerHTML = `
@@ -84,7 +108,21 @@ export default function renderScreen(document, game, currentPlayerId) {
                     </div>
                 </div>
             `;
+
             playerHand.append(cardHtml);
+            state.playerHand[cardId] = Object.assign({ html:cardHtml }, card);
+
+            cardHtml.addEventListener('click', () => {
+                notifyAll({
+                    type: 'card-click',
+                    playerId: currentPlayerId,
+                    cardId
+                });
+            });
         }
+    }
+
+    return {
+        subscribe
     }
 }
