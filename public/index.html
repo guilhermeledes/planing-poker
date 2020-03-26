@@ -1,7 +1,11 @@
-<html>
+<!DOCTYPE html>
+<html lang="pt-br">
     <head>
         <meta charset="utf-8">
         <title>Planning Poker</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
@@ -11,9 +15,9 @@
         <style>
             #poker-table, #player-hand {
                 width: 90%;
-                border-radius: 30px;
+                border-radius: 15px;
                 border: 3px solid #ccc;
-                padding: 15px;
+                padding: 5px;
                 margin: 25px auto;
                 display: flow-root;
             }
@@ -29,8 +33,8 @@
 
             .player, .hand {
                 float: left;
-                padding-right: 15px;
-                width: 130px;
+                padding: 5px;
+                width: 107px;
             }
 
             .player .player-name {
@@ -46,7 +50,7 @@
 
             .card-game {
                 background-color: transparent;
-                width: 115px;
+                width: 100px;
                 height: 130px;
                 perspective: 1000px;
             }
@@ -92,7 +96,7 @@
             }
 
             .hand .card-game .card-game-fill > .card-game-label {
-                font-size: 55px;
+                font-size: 50px;
             }
 
             .card-game .card-game-fill > .card-game-label > .fa {
@@ -122,12 +126,15 @@
         <div id="poker-table"></div>
 
         <div id="player-identification" class="container">
-            <div class="form-group">
-                <label for="name">Nome:</label>
-                <input type="text" class="form-control" id="name">
-            </div>
+            <form class="needs-validation">
+                <div class="form-group">
+                    <label for="name">Nome:</label>
+                    <input type="text" class="form-control" id="name" required novalidate>
+                    <div class="invalid-feedback">Campo obrigatório.</div>
+                </div>
 
-            <button>Entrar no Jogo</button>
+                <button type="submit" class="btn btn-primary">Entrar no Jogo</button>
+            </form>
         </div>
 
         <script src="/socket.io/socket.io.js"></script>
@@ -139,7 +146,12 @@
             const game = createGame();
             const socket = io();
 
-            $('button').addEventListener('click', () => {
+            $('button').addEventListener('click', (event) => {
+                if ($('form').checkValidity() === false) $('form').classList.add('was-validated');
+            });
+
+            $('form').addEventListener('submit', (event) => {
+                event.preventDefault();
                 const playerId = socket.id;
                 const player = {
                     playerId,
@@ -151,12 +163,12 @@
             socket.on('connect', () => {
                 const playerId = socket.id;
                 console.log(`Player id: ${playerId}`);
-
-                renderScreen(document, game, requestAnimationFrame, playerId);
             });
 
             socket.on('setup', (state) => {
+                const playerId = socket.id;
                 game.setState(state);
+                renderScreen(document, game, playerId);
             });
 
             socket.on('add-player', (command) => {

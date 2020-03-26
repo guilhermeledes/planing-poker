@@ -1,27 +1,41 @@
-export default function renderScreen(screen, game, requestAnimationFrame, currentPlayerId) {
-    const $ = screen.querySelectorAll.bind(screen);
-
-    let pokerTable = $('#poker-table', screen)[0];
-
-    $('.player', pokerTable).forEach(playerHtml => {
-        let exists = false;
-        for (const playerId in game.state.players) {
-            const player = game.state.players[playerId];
-            if (player.playerHtml == playerHtml) exists = true;
-        }
-        if (!exists) playerHtml.remove();
-    });
+export default function renderScreen(document, game, currentPlayerId) {
+    const state = {
+        players: {}
+    }
+    const $ = document.querySelectorAll.bind(document);
+    const pokerTable = $('#poker-table', document)[0];
 
     for (const playerId in game.state.players) {
         const player = game.state.players[playerId];
-        if (!player.playerHtml) {
-            addPlayer(player);
-            if (playerId === currentPlayerId) {
-                $('#player-identification', screen)[0].remove();
-                addPlayerHand();
+        addPlayer(player);
+    }
+
+    const renderingCommands = {
+        'add-player': (command) => {
+            const playerId = command.playerId;
+            const player = game.state.players[playerId];
+            if (!player.playerHtml) {
+                addPlayer(player);
+                if (playerId === currentPlayerId) {
+                    $('#player-identification', document)[0].remove();
+                    addPlayerHand();
+                }
             }
+        },
+        'remove-player': (command) => {
+            const playerId = command.playerId;
+            const player = state.players[playerId]
+            if (player) player.html.remove();
         }
     }
+
+    game.subscribe((command) => {
+        const renderFuncion = renderingCommands[command.type];
+        if (renderFuncion) {
+            console.log(`Rendering ${command.type} -> ${command.playerId}`);
+            renderFuncion(command);
+        }
+    });
 
     function addPlayer(player) {
         let playerHtml = document.createElement('div');
@@ -46,13 +60,13 @@ export default function renderScreen(screen, game, requestAnimationFrame, curren
             <span class="player-name">${player.playerName}</span>
         `;
         pokerTable.append(playerHtml);
-        game.state.players[player.playerId].playerHtml = playerHtml;
+        state.players[player.playerId] = { html: playerHtml};
     }
 
     function addPlayerHand() {
         let playerHand = document.createElement('div');
         playerHand.id = 'player-hand';
-        $('body', screen)[0].append(playerHand);
+        $('body', document)[0].append(playerHand);
 
         for (const cardId in game.cards) {
             const card = game.cards[cardId];
@@ -72,8 +86,4 @@ export default function renderScreen(screen, game, requestAnimationFrame, curren
             playerHand.append(cardHtml);
         }
     }
-
-    requestAnimationFrame(() => {
-        renderScreen(screen, game, requestAnimationFrame, currentPlayerId);
-    });
 }
