@@ -1,9 +1,10 @@
 export default function renderScreen(document, game, currentPlayerId) {
-    const state = {
-        players: {}
-    }
     const $ = document.querySelectorAll.bind(document);
     const pokerTable = $('#poker-table', document)[0];
+    const state = {
+        pokerTable,
+        players: {}
+    }
 
     for (const playerId in game.state.players) {
         const player = game.state.players[playerId];
@@ -59,7 +60,7 @@ export default function renderScreen(document, game, currentPlayerId) {
             </div>
             <span class="player-name">${player.playerName}</span>
         `;
-        pokerTable.append(playerHtml);
+        state.pokerTable.append(playerHtml);
         state.players[player.playerId] = { html: playerHtml};
     }
 
