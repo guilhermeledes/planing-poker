@@ -1,0 +1,3 @@
+tasks:
+- init: nvm install 13
+  command: node server
