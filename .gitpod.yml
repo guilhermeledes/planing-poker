@@ -1,2 +1,2 @@
 tasks:
- - command: nvm install 13 && node server
+ - command: nvm install 13 && npm install && node server
