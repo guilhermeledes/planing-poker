@@ -45,7 +45,7 @@ sockets.on('connection', (socket) => {
         });
     });
 
-    socket.on('restart-game', (command) => {
+    socket.on('restart-game', () => {
         console.log(`> restart-game`);
 
         game.restart();
