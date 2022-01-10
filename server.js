@@ -23,7 +23,7 @@ sockets.on('connection', (socket) => {
     socket.emit('setup', game.state);
 
     socket.on('disconnect', () => {
-        game.removePlayer({playerId});
+        game.removePlayer({ playerId });
         console.log(`Player disconnected ${playerId}`);
     });
 
@@ -52,7 +52,7 @@ sockets.on('connection', (socket) => {
     });
 
 });
-
-server.listen(3000, () => {
-    console.log(`> Server listening on port: 3000`);
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
+    console.log(`> Server listening on port: ${port}`);
 });
